@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { handleMessage } = require('./agent');
 
 const router = Router();
 
@@ -17,8 +18,23 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  console.log('[WEBHOOK] Mensaje recibido de Meta:', JSON.stringify(req.body, null, 2));
   res.sendStatus(200);
+
+  try {
+    const entry = req.body?.entry?.[0];
+    const change = entry?.changes?.[0];
+    const message = change?.value?.messages?.[0];
+
+    if (!message || message.type !== 'text') return;
+
+    const phoneNumber = message.from;
+    const userMessage = message.text.body;
+
+    console.log(`[WEBHOOK] Mensaje de ${phoneNumber}: "${userMessage}"`);
+    handleMessage(phoneNumber, userMessage);
+  } catch (err) {
+    console.error('[WEBHOOK] Error extrayendo mensaje:', err.message);
+  }
 });
 
 module.exports = router;
