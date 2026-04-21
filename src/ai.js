@@ -1,7 +1,7 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 const SYSTEM_PROMPT = `Eres el asistente virtual de una barbería en Santiago, Chile.
 Tu rol es ayudar a los clientes a agendar citas de forma amigable y eficiente.
@@ -17,7 +17,7 @@ async function getAIResponse(history, userMessage) {
         role: msg.role,
         parts: [{ text: msg.content }],
       })),
-      systemInstruction: SYSTEM_PROMPT,
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
     });
 
     const result = await chat.sendMessage(userMessage);
@@ -25,7 +25,7 @@ async function getAIResponse(history, userMessage) {
     console.log(`[AI] Respuesta generada (${response.length} chars)`);
     return response;
   } catch (err) {
-    console.error('[AI] Error al llamar a Gemini:', err.message);
+    console.error("[AI] Error al llamar a Gemini:", err.message);
     throw err;
   }
 }
