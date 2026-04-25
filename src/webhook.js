@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { handleMessage } = require('./agent');
+const { isDuplicateMessage } = require('./db');
 
 const router = Router();
 
@@ -26,6 +27,11 @@ router.post('/', (req, res) => {
     const message = change?.value?.messages?.[0];
 
     if (!message || message.type !== 'text') return;
+
+    if (isDuplicateMessage(message.id)) {
+      console.warn(`[WEBHOOK] Mensaje duplicado ignorado: ${message.id}`);
+      return;
+    }
 
     const phoneNumber = message.from;
     const userMessage = message.text.body;
