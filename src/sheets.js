@@ -1,13 +1,22 @@
 const { google } = require('googleapis');
 const path = require('path');
 
-const CREDENTIALS_PATH = path.join(__dirname, '..', 'google-credentials.json');
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = 'Citas';
 
 async function getSheetsClient() {
+  let credentials;
+
+  if (process.env.GOOGLE_CREDENTIALS_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  } else {
+    // Solo en desarrollo local con el archivo
+    const credentialsPath = path.join(__dirname, '..', 'google-credentials.json');
+    credentials = require(credentialsPath);
+  }
+
   const auth = new google.auth.GoogleAuth({
-    keyFile: CREDENTIALS_PATH,
+    credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
   return google.sheets({ version: 'v4', auth });
