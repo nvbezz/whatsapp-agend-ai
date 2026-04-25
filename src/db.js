@@ -9,6 +9,11 @@ const db = new Database(path.join(dataDir, 'db.sqlite'));
 db.pragma('journal_mode = WAL');
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS processed_messages (
+    message_id TEXT PRIMARY KEY,
+    processed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS conversations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     phone_number TEXT UNIQUE NOT NULL,
@@ -61,4 +66,19 @@ function createAppointment({ phoneNumber, name, date, time, service }) {
   return result.lastInsertRowid;
 }
 
-module.exports = { getOrCreateConversation, updateHistory, createAppointment };
+function isDuplicateMessage(messageId) {
+  const existing = db.prepare('SELECT message_id FROM processed_messages WHERE message_id = ?').get(messageId);
+  if (existing) return true;
+  db.prepare('INSERT INTO processed_messages (message_id) VALUES (?)').run(messageId);
+  return false;
+}
+
+function isSlotTaken(date, time) {
+  const row = db.prepare(`
+    SELECT id FROM appointments
+    WHERE date = ? AND time = ? AND status = 'confirmed'
+  `).get(date, time);
+  return !!row;
+}
+
+module.exports = { getOrCreateConversation, updateHistory, createAppointment, isSlotTaken, isDuplicateMessage };
