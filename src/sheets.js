@@ -1,4 +1,4 @@
-const { google } = require('googleapis');
+const { sheets, auth } = require('@googleapis/sheets');
 const path = require('path');
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
@@ -10,24 +10,24 @@ async function getSheetsClient() {
   if (process.env.GOOGLE_CREDENTIALS_JSON) {
     credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
   } else {
-    // Solo en desarrollo local con el archivo
     const credentialsPath = path.join(__dirname, '..', 'google-credentials.json');
     credentials = require(credentialsPath);
   }
 
-  const auth = new google.auth.GoogleAuth({
+  const authClient = new auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
-  return google.sheets({ version: 'v4', auth });
+
+  return sheets({ version: 'v4', auth: authClient });
 }
 
 async function appendAppointment({ name, phoneNumber, service, date, time }) {
   try {
-    const sheets = await getSheetsClient();
+    const client = await getSheetsClient();
     const now = new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' });
 
-    await sheets.spreadsheets.values.append({
+    await client.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
       range: `${SHEET_NAME}!A:F`,
       valueInputOption: 'USER_ENTERED',
