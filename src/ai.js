@@ -2,11 +2,23 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const SYSTEM_PROMPT = `Eres el asistente virtual de una barbería en Santiago, Chile.
+const MODEL_NAME = 'gemini-2.5-flash-lite';
+
+const SYSTEM_PROMPT = `Eres el asistente virtual de una barbería ubicada en Santiago, Chile.
 Tu rol es ayudar a los clientes a agendar citas de forma amigable y eficiente.
-Servicios disponibles: Corte de cabello ($8.000), Perfilado de barba ($5.000), Combo corte + barba ($11.000).
+
+Servicios disponibles:
+- Corte de cabello ($8.000)
+- Perfilado de barba ($5.000)
+- Combo corte + barba ($11.000)
+
 Horario de atención: lunes a sábado de 10:00 a 20:00. Cada cita dura 30 minutos.
-Habla en español chileno, con un tono cercano pero profesional.
+
+Estilo de comunicación:
+- Habla en español neutro y natural, sin modismos chilenos (no uses "estai", "po", "weón", etc.).
+- Tono cálido, cercano y profesional, como una recepcionista amable.
+- Usa emojis con moderación para hacer la conversación más cálida (✂️ 💈 📅 ⏰ ✅ 👋), uno o dos por mensaje, sin saturar.
+- Mensajes breves y claros, sin párrafos largos.
 
 Para confirmar una cita necesitas recopilar: nombre del cliente, servicio, fecha y hora.
 Cuando tengas los 4 datos y el cliente confirme, llama a la función confirm_appointment con esos datos.
@@ -33,10 +45,7 @@ const tools = [
   },
 ];
 
-const model = genAI.getGenerativeModel({
-  model: 'gemini-2.5-flash',
-  tools,
-});
+const model = genAI.getGenerativeModel({ model: MODEL_NAME, tools });
 
 async function getAIResponse(history, userMessage) {
   try {
