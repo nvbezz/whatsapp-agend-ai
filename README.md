@@ -1,12 +1,13 @@
 # 🤖 WhatsApp Agend AI
 
-Agente inteligente de WhatsApp desarrollado con **Node.js** y **Gemini 2.5 Flash** para la gestión automatizada de citas médicas y comerciales.
+Agente inteligente de WhatsApp desarrollado con **Node.js** y **Gemini 2.5 Flash-Lite** para la gestión automatizada de citas médicas y comerciales.
 
 ## 🚀 Características
-- **IA Generativa:** Procesamiento de lenguaje natural con Gemini para entender solicitudes de agendamiento.
-- **Persistencia:** Base de datos ligera con SQLite para almacenar conversaciones y citas.
-- **Canal Oficial:** Integración con WhatsApp Cloud API (Meta).
-- **Seguridad:** Configuración profesional mediante variables de entorno.
+- **IA Generativa:** Gemini 2.5 Flash-Lite con function calling para confirmar citas estructuradas.
+- **Persistencia:** PostgreSQL con índices únicos para evitar reservas duplicadas.
+- **Canal Oficial:** Integración con WhatsApp Cloud API (Meta) con validación HMAC.
+- **Seguridad:** Variables de entorno, rate limiting por número, validación de firma del webhook.
+- **Robustez:** Health check, manejo de mensajes no-texto, cleanup automático de tablas.
 
 ## 🛠️ Requisitos previos
 1. [Node.js](https://nodejs.org/) v18+ instalado.
